@@ -18,7 +18,8 @@ exports.asyncrust = (title) => {
             'execution/chapter',
             'execution/future',
             'execution/wakeups',
-            'execution/executor'
+            'execution/executor',
+            'execution/io'
             ]
         },
         {

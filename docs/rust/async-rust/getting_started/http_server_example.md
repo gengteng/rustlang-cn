@@ -1,39 +1,40 @@
-# 简单的 HTTP 服务器
+# 应用:简单HTTP服务器
 
-让我们用 `async`/`await!` 构建一个 echo 服务器！
-首先，执行 `rustup update nightly` 来确保你已经使用了最新以及最好的 Rust 版本——我们要使用最前沿的特性，所以需要保持最新。完成这一步之后，执行 `cargo +nightly new async-await-echo` 来创建一个工程，然后打开生成的 `async-await-echo` 目录。
+让我们使用`async/ await!`构建一个echo服务器！
 
-我们在 `Cargo.toml` 文件中加入一些依赖项:
+首先，请`rustup update nightly`确保您的Rust最新 -- 我们正在使用最前沿的功能，因此保持最新状态至关重要。完成后，运行 `cargo +nightly new async-await-echo`以创建新项目，然后打开生成的`async-await-echo`文件夹。
 
-```toml
+让我们在`Cargo.toml`文件中添加一些依赖项：
+
+```rust
 [dependencies]
- # The latest version of the "futures" library, which has lots of utilities
-# for writing async code. Enable the "tokio-compat" feature to include the
-# functions for using futures 0.3 and async/await with the Tokio library.
+// The latest version of the "futures" library, which has lots of utilities
+// for writing async code. Enable the "tokio-compat" feature to include the
+// functions for using futures 0.3 and async/await with the Tokio library.
 futures-preview = { version = "0.3.0-alpha.9", features = "tokio-compat"] }
- # Hyper is an asynchronous HTTP library. We'll use it to power our HTTP
-# server and to make HTTP requests.
+// Hyper is an asynchronous HTTP library. We'll use it to power our HTTP
+// server and to make HTTP requests.
 hyper = "0.12.9"
- # Tokio is a runtime for asynchronous I/O applications. Hyper uses
-# it for the default server runtime. The `tokio` crate also provides an
-# an `await!` macro similar to the one in `std`, but it supports `await!`ing
-# both futures 0.1 futures (the kind used by Hyper and Tokio) and
-# futures 0.3 futures (the kind produced by the new `async`/`await!` language
-# feature).
+// Tokio is a runtime for asynchronous I/O applications. Hyper uses
+// it for the default server runtime. The `tokio` crate also provides an
+// an `await!` macro similar to the one in `std`, but it supports `await!`ing
+// both futures 0.1 futures (the kind used by Hyper and Tokio) and
+// futures 0.3 futures (the kind produced by the new `async`/`await!` language
+// feature).
 tokio = { version = "0.1.11", features = ["async-await-preview"] }
 ```
 
-好的，我们已经搞定了依赖项，现在开始编码。打开 `src/main.rs` 文件，并在文件开头处启用下面的特性：
+现在我们已经完成依赖项了，让我们开始编写一些代码。打开`src/main.rs`并在文件的顶部启用以下功能：
 
  ```rust
 #![feature(async_await, await_macro, futures_api)]
 ```
 
 - `async_await` 增加了对 `async fn` 语法的支持。
-- `await_macro` 增加了对 `await!` 宏的支持.
-- `futures_api` 增加了对 nightly 版本中 `std::future` 和 `std::task` 模块的支持，这两个模块定义了核心库的 `Future` 特质以及相关依赖类型。
-  
-另外，我们还需要再加一些导入项：
+- `await_macro` 增加了对 `await!` 宏的支持。
+- `futures_api` 增加了对 nightly `std::future` 和 `std::task` 模块的支持,这些模块定义了核心Future特征和依赖类型。
+
+另外，我们还要添加一些导入：
 
 ```rust
 use {
@@ -64,9 +65,7 @@ use {
 };
 ```
 
-处理好了导入项，
-Once the imports are out of the way, we can start putting together the
-boilerplate to allow us to serve requests:
+一旦导入完成，我们就可以开始整理样板，以便我们提供请求服务：
 
 ```rust
 async fn serve_req(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
@@ -109,13 +108,7 @@ fn main() {
     run(futures_01_future);
 }
 ```
-
-如果现在执行 `cargo run`，你应该能看到终端输出 "Listening on http://127.0.0.1:300" 的消息。在浏览器中打开这个 URL，你将看到 "thread ... panicked at 'not yet implemented'." 的字样。不错！我们只缺处理请求的代码了。开始我们先直接返回一个静态的消息：
-If you `cargo run` now, you should see the message "Listening on
-http://127.0.0.1:300" printed on your terminal. If you open that URL in your
-browser of choice, you'll see "thread ... panicked at 'not yet implemented'."
-Great! Now we just need to actually handle requests. To start, let's just
-return a static message:
+如果您现在`cargo run`，您应该在终端上看到"Listening on http://127.0.0.1:300"消息。如果您在所选择的浏览器中打开该URL，您将看到"thread ... panicked at 'not yet implemented'." 现在我们只需要实际处理请求。首先，让我们返回一条静态消息：
 
 ```rust
 async fn serve_req(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
@@ -125,31 +118,24 @@ async fn serve_req(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
 }
 ```
 
-If you `cargo run` again and refresh the page, you should see "hello, world!"
-appear in your browser. Congratulations! You just wrote your first asynchronous
-webserver in Rust.
- You can also inspect the request itself, which contains information such as
-the request URI, HTTP version, headers, and other metadata. For example, we
-can print out the URI of the request like this:
+如果你`cargo run`再次刷新页面，你应该看到"hello, world!" 出现在浏览器中。恭喜！您刚刚在Rust中编写了第一个异步Web服务器。
+
+您还可以检查请求本身，其中包含请求URI，HTTP版本，标头和其他元数据等信息。例如，我们可以打印出请求的URI，如下所示：
 
 ```rust
 println!("Got request at {:?}", req.uri());
 ```
 
-You may have noticed that our ight now, we're not even doing
-anything asynchronous when handling the request-- we just respond immediately,
-so we're not taking advantage of the flexibility that `async fn` gives us.
-Rather than just returning a static message, let's try proxying the user's
-request to another website using Hyper's HTTP client.
- We start by parsing out the URL we want to request:
+你可能已经注意到我们在处理请求时还没有做任何异步 - 我们只是立即回应，所以我们没有利用`async fn`给我们的灵活性。让我们尝试使用`Hyper`的HTTP客户端将用户的请求代理到另一个网站，而不仅仅是返回静态消息。
+
+我们首先解析出我们想要请求的URL：
 
 ```rust
 let url_str = "http://www.rust-lang.org/en-US/";
 let url = url_str.parse::<Uri>().expect("failed to parse URL");
 ```
 
-Then we can create a new `hyper::Client` and use it to make a `GET` request,
-returning the response to the user:
+然后我们可以创建一个新的`hyper::Client`并使用它来发出`GET`请求，将响应返回给用户：
 
 ```rust
 let res = await!(Client::new().get(url));
@@ -158,15 +144,9 @@ println!("request finished --returning response");
 res
 ```
 
-`Client::get` returns a `hyper::client::FutureResponse`, which implements
-`Future<Output = Result<Response, Error>>`
-(or `Future<Item = Response, Error = Error>` in futures 0.1 terms).
-When we `await!` that future, an HTTP request is sent out, the current task
-is suspended, and the task is queued to be continued once a response has
-become available.
+`Client::get`返回`hyper::client::FutureResponse`，他实现了 `Future<Output = Result<Response, Error>>` （或`Future<Item = Response, Error = Error>` 在futures 0.1）。当我们`await!`这个`future`时,`HTTP`请求已发出，当前任务被暂停，并且一旦响应可用，任务就排队等待继续。
 
-Now, if you `cargo run` and open `http://127.0.0.1:3000/foo` in your browser,
-you'll see the Rust homepage, and the following terminal output:
+现在，如果`cargo run`您在浏览器中打开`http://127.0.0.1:3000/foo`，您将看到Rust主页，以及以下终端输出：
 
 ```bash
 Listening on http://127.0.0.1:3000
@@ -175,4 +155,4 @@ making request to http://www.rust-lang.org/en-US/
 request finished-- returning response
 ```
 
-Congratulations! You just proxied an HTTP request.
+恭喜！您刚刚完成了代理HTTP请求。

@@ -1,16 +1,11 @@
 # `async`/`await!`
 
-In [the first chapter], we took a brief look at `async`/`await!` and used
-it to build a simple server. This chapter will discuss `async`/`await!` in
-greater detail, explaining how it works and how `async` code differs from
-traditional Rust programs.
 
-`async`/`await!` are special pieces of Rust syntax that make it possible to
-yield control of the current thread rather than blocking, allowing other
-code to make progress while waiting on an operation to complete.
+在[第一章]中，我们简要介绍了`async/ await!`并使用它来构建一个简单的服务器。本章将更详细地讨论`async/ await!`解释它如何工作以及`async`代码与传统Rust程序的不同之处。
 
-There are three main ways to use `async`: `async fn`, `async` blocks, and
-`async` closures. Each returns a value that implements the `Future` trait:
+`async/ await!`是Rust语法的特殊部分，可以控制当前线程而不阻塞，允许其他代码在等待操作完成时取得进展。
+
+`async`有三种主要的使用方法：`async fn`，`async块`和 `async闭包`。每个返回一个实现`Future`特征的值：
 
 ```rust
 // `foo()` returns a type that implements `Future<Output = u8>`.
@@ -36,15 +31,11 @@ fn baz() -> impl Future<Output = u8> {
 }
 ```
 
-As we saw in the first chapter, `async` bodies and other futures are lazy:
-they do nothing until they are run. The most common way to run a `Future`
-is to `await!` it. When `await!` is called on a `Future`, it will attempt
-to run it to completion. If the `Future` is blocked, it will yield control
-of the current thread. When more progress can be made, the `Future` will be picked
-up by the executor and will resume running, allowing the `await!` to resolve.
+正如我们在第一章中看到的那样，`async`和其他`Future`是懒惰的：它们在运行之前什么都不做。运行`Future`的最常见方式是`await!`它。当在Future`上调用`await!`时，它将尝试运行以完成它。如果`Future`被阻止，它将让出当前线程。当可以取得更多进展时，执行者将获取 `Future`并将继续运行，以便`await!`解决。
 
-## `async` Lifetimes
+## `async` 生命周期
 
+`async fn`与传统函数不同，带引用或其他非`'static`参数的,返回一个受参数生命周期限制的`Future`：
 Unlike traditional functions, `async fn`s which take references or other
 non-`'static` arguments return a `Future` which is bounded by the lifetime of
 the arguments:
