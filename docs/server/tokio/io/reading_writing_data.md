@@ -1,24 +1,18 @@
 # 数据读写
 
-## Non-blocking I/O
+## 无阻塞 I/O
 
-In [the overview] we mentioned briefly that Tokio's I/O types implement
-non-blocking variants of `std::io::Read` and `std::io::Write` called
-[`AsyncRead`] and [`AsyncWrite`]. These are an integral part of Tokio's
-I/O story, and are important to understand when working with I/O code.
+在 [概述] 中，我们简单地提了一下 Tokio 的 I/O 类型实现了 `std::io::Read` 和 `std::io::Write` 的无阻塞版本 [`AsyncRead`] 和 [`AsyncWrite`]。还有一部分关于 Tokio I/O 的不可或缺的知识，对于理解何时使用这些代码至关重要。
 
-> Note: in this section, we'll primarily talk about `AsyncRead`, but
-> `AsyncWrite` is pretty much exactly the same, just for writing data to
-> an I/O resource (like a TCP socket) instead of reading from it.
+> 注意：在本节中，我们主要探讨 `AsyncRead`，而 `AsyncWrite` 也几乎是一样的，只不过它不是读取数据而是向一个I/O资源中写入数据（比如一个TCP套接字）。
 
-So, let's take a look at [`AsyncRead`] and see what all the fuss is
-about:
+好的，我们来看一下 [`AsyncRead`] 到底是个什么东西:
 
 ```rust
 use std::io::Read;
 pub trait AsyncRead: Read {
     // ...
-    // various provided methods
+    // 各种方法
     // ...
 }
 ```
